@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Project Overview: Inventory Monitoring at Distribution Centers
 
 Distribution centers often use robots to move objects as a part of their operations. Objects are carried in bins which can contain multiple objects. In this project, you will have to build a model that can count the number of objects in each bin. A system like this can be used to track inventory and make sure that delivery consignments have the correct number of items.
@@ -100,3 +101,6 @@ Once you have completed the standout suggestions, make sure that you explain wha
 
 ## Standout Suggestions
 **TODO (Optional):** This is where you can provide information about any standout suggestions that you have attempted.
+=======
+# SageMaker-Inventory-monitoring
+test
