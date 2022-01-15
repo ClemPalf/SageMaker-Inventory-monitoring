@@ -41,7 +41,7 @@ def test(model, loader, criterion, val_or_test, device):
     total_acc = running_corrects.double() / len(loader)
     
     if val_or_test == "val":
-        logger.info("\nVal set: Average loss: {:.2f}, Accuracy: {:.2f}\n".format(total_loss, total_acc))
+        logger.info("\nValidation set: Average loss: {:.2f}, Accuracy: {:.2f}\n".format(total_loss, total_acc))
     else:   
         logger.info("\nTest set: Average loss: {:.2f}, Accuracy: {:.2f}\n".format(total_loss, total_acc)) 
     
