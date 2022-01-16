@@ -16,7 +16,6 @@ import smdebug.pytorch as smd
 from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True # Otherwise it throws the error "OSError: image file is truncated (150 bytes not processed)"
-dist.init_process_group()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -109,7 +108,7 @@ def net():
     '''
     Initialize a pretrained model.
     '''
-    # We will train the whole model, but still start from the pre-trained weights
+    
     model = models.vgg11_bn(pretrained=True)
 
     #for param in model.parameters():
@@ -117,6 +116,7 @@ def net():
 
     num_features=model.classifier[6].in_features # 1000 
     model.classifier[6] = nn.Sequential(nn.Linear(num_features, 500), # No need for a softmax, it is included in the "nn.CrossEntropyLoss()"
+                                        nn.Linear(500, 250),
                                         nn.Linear(250, 5))
     return model
 
@@ -138,7 +138,7 @@ def create_data_loaders(data, batch_size):
     
     # The dataset.ImageFolder function will automatically assign label to the images according to their subdirectories.
     train_dataset = torchvision.datasets.ImageFolder(root=os.path.join(data, 'train'), transform=training_transform)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, sampler=train_sampler)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     
     val_dataset = torchvision.datasets.ImageFolder(root=os.path.join(data, 'validation'), transform=testing_transform)
     val_loader  = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size) 

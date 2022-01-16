@@ -11,11 +11,10 @@ import logging
 import sys
 import copy
 import smdebug.pytorch as smd
-#import smdistributed.dataparallel.torch.distributed as dist
-#from smdistributed.dataparallel.torch.parallel.distributed import DistributedDataParallel as DDP
-from PIL import ImageFile
 
+from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True # Otherwise it throws the error "OSError: image file is truncated (150 bytes not processed)"
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
@@ -57,7 +56,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, hook, device):
     '''
     hook.set_mode(smd.modes.TRAIN)  # Set the SMDebug hook for the training phase.
 
-    epochs = 10       
+    epochs = 3        
     
     # To keep track of the best performing model (if we end up overfitting, it won't be a problem).
     best_model_wts = copy.deepcopy(model.state_dict())   
@@ -93,7 +92,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, hook, device):
         logger.info("\nTraining set: Average loss: {:.2f}, Accuracy: {:.2f}\n".format(epoch_loss, epoch_acc))                                                                                                                       
         
         # Now, let's calculate the validation loss, if it is an "all-time-low", we will save the model.
-        
         current_val_loss = test(model, val_loader, criterion, "val", hook, device)    # Pass the SMDebug hook to the test function
         if current_val_loss < smallest_val_loss:
             smallest_val_loss = current_val_loss
@@ -108,23 +106,31 @@ def net():
     '''
     Initialize a pretrained model.
     '''
-    
+    # For this project, I chose to use the alexnet model.
     model = models.vgg11_bn(pretrained=True)
 
-    #for param in model.parameters():
-    #    param.requires_grad = False   
+    for param in model.parameters():
+        param.requires_grad = False   
 
     num_features=model.classifier[6].in_features # 1000 
-    model.classifier[6] = nn.Sequential(nn.Linear(num_features, 500), # No need for a softmax, it is included in the "nn.CrossEntropyLoss()"
-                                        nn.Linear(500, 250),
-                                        nn.Linear(250, 5))
+    
+    # I added a few layers for a "smoother" descent to 133 neurons.
+    model.classifier[6] = nn.Sequential(
+        nn.Linear(num_features, 750),
+        nn.ReLU(inplace=True),
+        nn.Linear(750, 500),
+        nn.ReLU(inplace=True),
+        nn.Linear(500, 250),
+        nn.ReLU(inplace=True),
+        nn.Linear(250, 5)) # No need for a softmax, it is included in the "nn.CrossEntropyLoss()"
+    
     return model
 
 def create_data_loaders(data, batch_size):
     
     training_transform = transforms.Compose([
         transforms.RandomHorizontalFlip(p=0.5),                   # To improve training, let's add a 50% chance of horizontal flip.
-        transforms.Resize((224, 224)),                            # The VGG model requires a 224*224 input dimension.
+        transforms.Resize((224, 224)),                            # The Alexnet model requires a 224*224 input dimension.
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406],   # Targeted mean for each color channel.
                              std=[0.229, 0.224, 0.225])])  # Targeted std for each color channel.
@@ -134,7 +140,6 @@ def create_data_loaders(data, batch_size):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], 
                              std=[0.229, 0.224, 0.225])])
-    
     
     # The dataset.ImageFolder function will automatically assign label to the images according to their subdirectories.
     train_dataset = torchvision.datasets.ImageFolder(root=os.path.join(data, 'train'), transform=training_transform)
@@ -153,7 +158,8 @@ def main(args):
     Initialize a model by calling the net function.
     '''
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model=net().to(device)
+    model=net()
+    model=model.to(device)
     hook = smd.Hook.create_from_json_file()
     hook.register_hook(model)
 
@@ -161,15 +167,12 @@ def main(args):
     Create loss and optimizer.
     '''
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = optim.Adam(model.classifier[6].parameters(), lr=args.lr)
     
     '''
     Call the train function to start training the model.
     '''
-    
-    
-    # Prepare batch_size for distributed training
-    
+    # Register the SMDebug hook to save the output tensors.
     train_loader, val_loader, test_loader = create_data_loaders(args.data, args.batch_size)
     logger.info("Starting model training...")
     model=train(model, train_loader, val_loader, criterion, optimizer, hook, device)  # Pass the SMDebug hook to the train function
@@ -178,7 +181,7 @@ def main(args):
     Test the model to see its accuracy
     '''
     #logger.info("Starting model evaluation...")
-    test(model, test_loader, criterion, "test", hook, device) # Pass the SMDebug hook to the test function
+    #test(model, test_loader, criterion, "test", hook, device) # Pass the SMDebug hook to the test function
     
     '''
     Save the trained model
