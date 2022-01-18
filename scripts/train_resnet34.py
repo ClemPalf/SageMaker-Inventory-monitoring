@@ -41,8 +41,8 @@ def test(model, loader, criterion, val_or_test, hook, device):
         running_loss += loss.item() * inputs.size(0)           
         running_corrects += torch.sum(preds == labels.data)    
 
-    total_loss = running_loss / len(loader)       
-    total_acc = running_corrects / len(loader)
+    total_loss = running_loss / len(loader.dataset)       
+    total_acc = running_corrects / len(loader.dataset)
     
     if val_or_test == "val":
         logger.info("\nVal set: Average loss: {:.2f}, Accuracy: {:.2f}\n".format(total_loss, total_acc))

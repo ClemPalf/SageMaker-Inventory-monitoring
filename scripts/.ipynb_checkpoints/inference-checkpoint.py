@@ -16,6 +16,7 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 URL_CONTENT_TYPE = 'string/url'
 JPEG_CONTENT_TYPE = 'image/jpeg'
 
+
 # Based on https://github.com/pytorch/examples/blob/master/mnist/main.py
 def Net():
 
