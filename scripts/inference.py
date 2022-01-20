@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 import os
+import tarfile
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

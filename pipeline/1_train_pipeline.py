@@ -50,7 +50,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device):
     Train the model.
     '''
 
-    epochs = 2       
+    epochs = 1
     
     # To keep track of the best performing model (if we end up overfitting, it won't be a problem).
     best_model_wts = copy.deepcopy(model.state_dict())   
@@ -102,10 +102,10 @@ def net():
     Initialize a pretrained model.
     '''
     
-    model = models.resnet34(pretrained=False)
+    model = models.resnet34(pretrained=True)
 
-    #for param in model.parameters():
-    #    param.requires_grad = False   
+    for param in model.parameters():
+        param.requires_grad = False   
 
     num_features=model.fc.in_features # 1000 
     model.fc = nn.Sequential(nn.Linear(num_features, 500), # No need for a softmax, it is included in the "nn.CrossEntropyLoss()"
@@ -152,7 +152,7 @@ def main(args):
     Create loss and optimizer.
     '''
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = optim.Adam(model.fc.parameters(), lr=args.lr)
     
     '''
     Call the train function to start training the model.

@@ -6,13 +6,13 @@ import torchvision
 import torchvision.models as models
 import torchvision.transforms as transforms
 import argparse
+import tarfile
 import os
 import logging
 import sys
 import copy
 import json
 import pathlib
-import xgboost
 from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True # Otherwise it throws the error "OSError: image file is truncated (150 bytes not processed)"
@@ -48,7 +48,6 @@ if __name__=='__main__':
         checkpoint = torch.load(f, map_location=device)
         model.load_state_dict(checkpoint)
         print('MODEL-LOADED')
-        logger.info('Model loaded successfully')
     model.eval()
     
     
@@ -78,7 +77,7 @@ if __name__=='__main__':
         _, preds = torch.max(outputs, 1)         
         running_corrects += torch.sum(preds == labels.data)    
      
-    total_acc = running_corrects / len(loader.dataset)
+    total_acc = running_corrects / len(test_loader.dataset)
     
     # Finally, let's save the result in a json file 
     report_dict = {"test_accuracy": total_acc}
