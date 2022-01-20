@@ -35,6 +35,9 @@ def net():
 
     
 if __name__=='__main__':
+    # printing environment variables
+    print(os.environ)
+    
     # First, let's load the model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = net().to(device)
@@ -88,9 +91,9 @@ if __name__=='__main__':
     output_dir = "/opt/ml/processing/evaluation"
     pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
     
-    evaluation_path = output_dir + "evaluation.json"
-    with open(evaluation_path, "w") as f:
-        f.write(json.dumps(report_dict))
+    evaluation_path = f"{output_dir}/evaluation.json"
+    with open(evaluation_path, "w") as j:
+        j.write(json.dumps(report_dict))
     
     # Let's also import the current_json file 
     json_path = "/opt/ml/processing/accuracy/current_accuracy.json"
