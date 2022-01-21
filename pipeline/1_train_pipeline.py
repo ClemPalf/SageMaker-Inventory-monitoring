@@ -13,7 +13,7 @@ import copy
 from PIL import ImageFile
 logger = logging.getLogger(__name__)
 ImageFile.LOAD_TRUNCATED_IMAGES = True # Otherwise it throws the error "OSError: image file is truncated (150 bytes not processed)"
-
+from shutil import copyfile
 
 def test(model, loader, criterion, val_or_test, device):
     '''
@@ -142,6 +142,8 @@ def create_data_loaders(data, batch_size):
     return train_loader, val_loader, test_loader
 
 def main(args):
+    
+    
     '''
     Initialize a model by calling the net function.
     '''
@@ -174,6 +176,13 @@ def main(args):
     '''
     Save the trained model
     '''
+    print("Everything is working??")
+    os.mkdir(os.path.join(args.model_dir, "code"))
+    copyfile(os.path.join(args.data, "inference.py"), os.path.join(args.model_dir, "code/inference.py"))
+    #!cp ${SM_CHANNEL_TRAINING}/inference.py ${SM_MODEL_DIR}/code/inference.py
+    print("still??")
+    
+    
     logger.info("Saving the model...")
     torch.save(model.cpu().state_dict(), os.path.join(args.model_dir, "model.pth"))
 

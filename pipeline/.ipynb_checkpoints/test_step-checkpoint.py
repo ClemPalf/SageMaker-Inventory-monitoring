@@ -5,7 +5,7 @@ import logging
 import boto3
 import os
 
-report_dict = {"Did_it_work": "Yes!"}
+report_dict = {"Did_it_work": "Yessss!"}
 with open("youpi.json", "w") as f:
     f.write(json.dumps(report_dict))
 
