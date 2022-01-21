@@ -41,7 +41,7 @@ def test(model, loader, criterion, val_or_test, device):
     if val_or_test == "val":
         logger.info("\nVal set: Average loss: {:.2f}, Accuracy: {:.2f}\n".format(total_loss, total_acc))
     else:   
-        logger.info("\nTest set: Average loss: {:.2f}, Accuracy: {:.2f}\n".format(total_loss, total_acc)) 
+        logger.info("\nTest set: Average loss: {:.2f}, Accuracey: {:.2f}\n".format(total_loss, total_acc)) 
     
     return total_loss
     

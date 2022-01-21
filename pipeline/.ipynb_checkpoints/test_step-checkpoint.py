@@ -11,5 +11,4 @@ with open("youpi.json", "w") as f:
 
 
 s3_client = boto3.client('s3')
-response = s3_client.upload_file("youpi.json", "s3://sagemaker-us-east-1-646714458109", "youpi.json")
-s3://sagemaker-us-east-1-646714458109/capstone-inventory-project/
+response = s3_client.upload_file("youpi.json", "sagemaker-us-east-1-646714458109", "capstone-inventory-project/youpi.json")
