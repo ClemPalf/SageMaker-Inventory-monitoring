@@ -84,7 +84,7 @@ if __name__=='__main__':
     print(type(total_acc))
     print(total_acc)
     # Finally, let's save the result in a json file 
-    report_dict = {"test_accuracy": total_acc}
+    report_dict = {"accuracy": total_acc}
     print(type(report_dict))
     print(report_dict)
 

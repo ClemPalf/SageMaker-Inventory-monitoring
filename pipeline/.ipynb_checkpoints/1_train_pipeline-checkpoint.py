@@ -50,7 +50,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device):
     Train the model.
     '''
 
-    epochs = 0
+    epochs = 3
     
     # To keep track of the best performing model (if we end up overfitting, it won't be a problem).
     best_model_wts = copy.deepcopy(model.state_dict())   

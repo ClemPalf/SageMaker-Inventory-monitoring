@@ -14,6 +14,9 @@ import copy
 import json
 import pathlib
 import sagemaker
+from sagemaker import get_execution_role
+import time
+
 import boto3
 
 
@@ -27,13 +30,10 @@ if __name__=='__main__':
 
     region = session.boto_region_name
     print("AWS Region: {}".format(region))
-
+    
     role = get_execution_role()
     print("RoleArn: {}".format(role))
 
-    
-    
-    
     
     # Print and parse environment variables
     print(os.environ)
@@ -47,6 +47,7 @@ if __name__=='__main__':
                                                   version="1.5",
                                                   instance_type="ml.m5.xlarge",
                                                   accelerator_type='ml.eia2.medium')   
+    
     # Remember that a model needs to have a unique name
     model_name = "capstone-inventory-monitoring-model-" + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
     primary_container = {
@@ -90,7 +91,7 @@ if __name__=='__main__':
     
     # Aslo, let's update our accuracy file
     s3_client = boto3.client('s3')
-    response = s3_client.upload_file("/opt/ml/processing/accuracy/evaluation.json", "sagemaker-us-east-1-646714458109", "current_accuracy.json")
+    response = s3_client.upload_file("/opt/ml/processing/accuracy/evaluation.json", "sagemaker-us-east-1-646714458109", "capstone-inventory-project/current_accuracy.json")
 
     
     
